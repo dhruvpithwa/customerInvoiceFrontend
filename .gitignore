@@ -1,0 +1,13 @@
+.idea/
+.next/
+.vscode/
+node_modules/
+.vscode
+.env*
+.env-prod
+package-lock.json
+*.csv
+*.sql
+.DS_Store
+src/.DS_Store
+*.log
