@@ -5,6 +5,7 @@ import { Box, Button, Grid, Select, MenuItem, TextField } from "@mui/material";
 
 import { updateProductAction } from "../../../store/products";
 import { ProductType } from "../../../enums/product";
+import { PriceType } from "../../../enums/price";
 
 export const EditProduct = ({ productId }) => {
 
@@ -16,6 +17,7 @@ export const EditProduct = ({ productId }) => {
             name: rows[productId].name,
             pricePerKg: rows[productId].pricePerKg,
             type: rows[productId].type,
+            priceType: rows[productId].priceType
         },
         validate: (values) => {
             const errors = {};
@@ -80,6 +82,22 @@ export const EditProduct = ({ productId }) => {
                     >
                         <MenuItem value={ProductType.WEIGHTED}>Weighted</MenuItem>
                         <MenuItem value={ProductType.NONWEIGHTED}>Non-weighted</MenuItem>
+                    </Select>
+                </Grid>
+
+                <Grid item xs={12} md={2} >
+                    <Select
+                        size="small"
+                        id="priceType"
+                        name="priceType"
+                        value={formik.values.priceType}
+                        label="Select Price Type"
+                        onChange={formik.handleChange}
+                        required
+                        fullWidth
+                    >
+                        <MenuItem value={PriceType.RETAIL}>Retail</MenuItem>
+                        <MenuItem value={PriceType.WHOLESALE}>Wholesale</MenuItem>
                     </Select>
                 </Grid>
 

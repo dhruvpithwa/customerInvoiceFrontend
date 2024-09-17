@@ -29,16 +29,22 @@ export const CreateOrder = () => {
     const { products: { rows} } = useSelector(state => state.productState);
     const productOptions = Object.keys(rows)?.map(id => { return { label: rows[id].name.toUpperCase(), productId: id, value: rows[id].name } });
 
-    const onProductSelect = (e, { label, productId}) => {
-        formik.setFieldValue('id', productId ?? "");
-        formik.setFieldValue('name', productId ? rows[productId]?.name : "");
-        formik.setFieldValue('type', productId ? rows[productId]?.type : "" );
-        formik.setFieldValue('basePrice', productId ? rows[productId]?.pricePerKg : 0);
-        formik.setFieldValue('price', productId ? rows[productId]?.pricePerKg * formik.values.quantity : 0);
+    const onProductSelect = (e, value) => {
+        if(value){
+            const { label, productId } = value;
+            formik.setFieldValue('id', productId ?? "");
+            formik.setFieldValue('name', productId ? rows[productId]?.name : "");
+            formik.setFieldValue('type', productId ? rows[productId]?.type : "" );
+            formik.setFieldValue('basePrice', productId ? rows[productId]?.pricePerKg : 0);
+            formik.setFieldValue('price', productId ? rows[productId]?.pricePerKg * formik.values.quantity : 0);
+        }
+        else{
+            formik.resetForm();
+        }
     }
 
     const onQuantityChange = (e) => {
-        const val = e.target.value.replace(/\D/g, '');
+        const val = e.target.value;
         formik.setFieldValue('quantity', val);
         formik.setFieldValue('price', formik.values.basePrice * val);
     }
@@ -218,13 +224,14 @@ export const CreateOrder = () => {
                                 />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField  
+                            <TextField
+                                type="number"  
                                 size="small"
                                 id="basePrice"
                                 name="basePrice"
-                                label="Base Price"
+                                label="Product Price"
                                 value={formik.values.basePrice}
-                                disabled
+                                onChange={formik.handleChange}
                                 required
                                 fullWidth
                                 error={formik.errors.basePrice}
@@ -248,6 +255,7 @@ export const CreateOrder = () => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 size="small"
+                                type="number"
                                 id="quantity"
                                 name="quantity"
                                 label="Quantity (Kg)"
@@ -265,7 +273,7 @@ export const CreateOrder = () => {
                                 size="small"
                                 id="price"
                                 name="price"
-                                label="Product Price"
+                                label="Total Price"
                                 value={formik.values.price}
                                 disabled
                                 required
@@ -275,8 +283,8 @@ export const CreateOrder = () => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Button variant="contained" onClick={createOrder} sx={{float: "right", margin: "5px"}}> Submit</Button>
-                            <Button variant="contained" onClick={formik.handleSubmit} sx={{float: "right", margin: "5px"}}>Add Product</Button>
+                            <Button variant="contained" onClick={createOrder} sx={{float: "right", margin: "5px"}} disabled={orderProps.orderItems.length === 0}> Submit</Button>
+                            <Button variant="contained" onClick={formik.handleSubmit} sx={{float: "right", margin: "5px"}} disabled={formik.values.name === ""}>Add Product</Button>
                         </Grid>
                     </Grid>
                 </Box>

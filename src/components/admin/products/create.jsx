@@ -5,6 +5,7 @@ import { Box, Button, Grid, Select, MenuItem, TextField } from "@mui/material";
 
 import { addProductAction } from "../../../store/products";
 import { ProductType } from "../../../enums/product";
+import { PriceType } from "../../../enums/price";
 
 export const CreateProduct = () => {
 
@@ -15,6 +16,7 @@ export const CreateProduct = () => {
             name: "",
             pricePerKg: "",
             type: ProductType.WEIGHTED,
+            priceType: PriceType.RETAIL
         },
         validate: (values) => {
             const errors = {};
@@ -37,7 +39,7 @@ export const CreateProduct = () => {
     return (    
         <Box component={"form"} noValidate autoComplete="off">
             <Grid container spacing={2}>
-                <Grid item xs={12} md={3} >
+                <Grid item xs={12} md={2} >
                     <TextField
                         size="small"
                         id="name"
@@ -51,7 +53,7 @@ export const CreateProduct = () => {
                         helperText={formik.errors.name}
                     />
                 </Grid>
-                <Grid item xs={12} md={3} >
+                <Grid item xs={12} md={2} >
                     <TextField
                         size="small"
                         id="pricePerKg"
@@ -67,7 +69,7 @@ export const CreateProduct = () => {
                     />
                 </Grid>
 
-                <Grid item xs={12} md={3} >
+                <Grid item xs={12} md={2} >
                     <Select
                         size="small"
                         id="type"
@@ -83,7 +85,23 @@ export const CreateProduct = () => {
                     </Select>
                 </Grid>
 
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={2} >
+                    <Select
+                        size="small"
+                        id="priceType"
+                        name="priceType"
+                        value={formik.values.priceType}
+                        label="Select Price Type"
+                        onChange={formik.handleChange}
+                        required
+                        fullWidth
+                    >
+                        <MenuItem value={PriceType.RETAIL}>Retail</MenuItem>
+                        <MenuItem value={PriceType.WHOLESALE}>Wholesale</MenuItem>
+                    </Select>
+                </Grid>
+
+                <Grid item xs={12} md={2}>
                     <Button variant="contained" fullWidth onClick={formik.handleSubmit}>Add Product</Button>
                 </Grid>
             </Grid>
