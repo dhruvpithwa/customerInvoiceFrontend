@@ -56,9 +56,9 @@ export const generatePdfDefinition = (data) => {
                         ...data.orderItems.map((item, index) => [
                             `${index + 1}.`,
                             item.name,
-                            `₹ ${item.basePrice}`,
+                            `₹ ${item.productPrice}`,
                             item.quantity,
-                            `₹ ${item.price}`
+                            `₹ ${item.totalPrice}`
                         ]),
                         [
                             { text: 'Subtotal', colSpan: 4 },

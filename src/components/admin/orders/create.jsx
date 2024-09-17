@@ -35,8 +35,9 @@ export const CreateOrder = () => {
             formik.setFieldValue('id', productId ?? "");
             formik.setFieldValue('name', productId ? rows[productId]?.name : "");
             formik.setFieldValue('type', productId ? rows[productId]?.type : "" );
-            formik.setFieldValue('basePrice', productId ? rows[productId]?.pricePerKg : 0);
-            formik.setFieldValue('price', productId ? rows[productId]?.pricePerKg * formik.values.quantity : 0);
+            formik.setFieldValue('priceType', productId ? rows[productId]?.priceType : "");
+            formik.setFieldValue('productPrice', productId ? rows[productId]?.pricePerKg : 0);
+            formik.setFieldValue('totalPrice', productId ? rows[productId]?.pricePerKg * formik.values.quantity : 0);
         }
         else{
             formik.resetForm();
@@ -46,7 +47,7 @@ export const CreateOrder = () => {
     const onQuantityChange = (e) => {
         const val = e.target.value;
         formik.setFieldValue('quantity', val);
-        formik.setFieldValue('price', formik.values.basePrice * val);
+        formik.setFieldValue('totalPrice', formik.values.productPrice * val);
     }
 
     const weighingScaleHandler = async () => {
@@ -54,7 +55,7 @@ export const CreateOrder = () => {
 
         if(weight){
             formik.setFieldValue('quantity', weight ); 
-            formik.setFieldValue('price', formik.values.basePrice * weight);
+            formik.setFieldValue('totalPrice', formik.values.productPrice * weight);
         }
     }
 
@@ -70,7 +71,7 @@ export const CreateOrder = () => {
     const removeItem = (index) => {
         const item = orderProps.orderItems[index];
 
-        const subTotal = orderProps.subTotal - item.price;
+        const subTotal = orderProps.subTotal - item.totalPrice;
         const tax = subTotal * (orderProps.taxPercent / 100);
 
         const newItem = {
@@ -94,9 +95,9 @@ export const CreateOrder = () => {
         const updatedProps = JSON.parse(JSON.stringify(pdfProps));
         updatedProps.orderItems = updatedProps['orderItems']?.map(item => { return { 
             name: rows[item.productId].name,
-            basePrice: rows[item.productId].pricePerKg,
+            productPrice: rows[item.productId].pricePerKg,
             quantity: item.quantity,
-            price: item.price
+            totalPrice: item.totalPrice
         }}) ?? [];
 
         const pdfObject = generatePdfDefinition(updatedProps);
@@ -129,14 +130,15 @@ export const CreateOrder = () => {
         initialValues: {
             id:"",
             type: "",
+            priceType: "",
             name: "",
-            basePrice: 0,
+            productPrice: 0,
             quantity: 0,
-            price: 0
+            totalPrice: 0
         },
         onSubmit: async (values) => {
 
-            const subTotal = orderProps.subTotal + values.price;
+            const subTotal = orderProps.subTotal + values.totalPrice;
             const tax = subTotal * (orderProps.taxPercent / 100);
 
             const newItem = {
@@ -145,8 +147,12 @@ export const CreateOrder = () => {
                 total: subTotal + tax,
                 orderItems: [...orderProps.orderItems, {
                     productId: values.id,
+                    name: values.name,
                     quantity: values.quantity,
-                    price: values.price
+                    productPrice: values.productPrice,
+                    totalPrice: values.totalPrice,
+                    type: values.type,
+                    priceType: values.priceType
                 }]
             };
 
@@ -227,15 +233,15 @@ export const CreateOrder = () => {
                             <TextField
                                 type="number"  
                                 size="small"
-                                id="basePrice"
-                                name="basePrice"
+                                id="productPrice"
+                                name="productPrice"
                                 label="Product Price"
-                                value={formik.values.basePrice}
+                                value={formik.values.productPrice}
                                 onChange={formik.handleChange}
                                 required
                                 fullWidth
-                                error={formik.errors.basePrice}
-                                helperText={formik.errors.basePrice}
+                                error={formik.errors.productPrice}
+                                helperText={formik.errors.productPrice}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -250,6 +256,20 @@ export const CreateOrder = () => {
                                 fullWidth
                                 error={formik.errors.type}
                                 helperText={formik.errors.type}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                size="small"
+                                id="priceType"
+                                name="priceType"
+                                label="Price Type"
+                                value={formik.values.priceType}
+                                disabled
+                                required
+                                fullWidth
+                                error={formik.errors.priceType}
+                                helperText={formik.errors.priceType}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -274,12 +294,12 @@ export const CreateOrder = () => {
                                 id="price"
                                 name="price"
                                 label="Total Price"
-                                value={formik.values.price}
+                                value={formik.values.totalPrice}
                                 disabled
                                 required
                                 fullWidth
-                                error={formik.errors.price}
-                                helperText={formik.errors.price}
+                                error={formik.errors.totalPrice}
+                                helperText={formik.errors.totalPrice}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -296,7 +316,7 @@ export const CreateOrder = () => {
                         <Card sx={{padding: '5px 15px ', margin: '5px 2px'}}>
                             <Grid container>
                                 <Grid item xs={10}>
-                                    <Typography variant='body2'>Name: {rows[item.productId].name} | Qty: {item.quantity} | Price: {item.price}</Typography>
+                                    <Typography variant='body2'>Name: {rows[item.productId].name} | Qty: {item.quantity} | Price: {item.totalPrice}</Typography>
                                 </Grid>
                                 <Grid item xs={2}>
                                     <Button size="small" onClick={() => removeItem(index)}><Delete /></Button>
