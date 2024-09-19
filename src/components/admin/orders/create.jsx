@@ -35,7 +35,6 @@ export const CreateOrder = () => {
             formik.setFieldValue('id', productId ?? "");
             formik.setFieldValue('name', productId ? rows[productId]?.name : "");
             formik.setFieldValue('type', productId ? rows[productId]?.type : "" );
-            formik.setFieldValue('priceType', productId ? rows[productId]?.priceType : "");
             formik.setFieldValue('productPrice', productId ? rows[productId]?.pricePerKg : 0);
             formik.setFieldValue('totalPrice', productId ? rows[productId]?.pricePerKg * formik.values.quantity : 0);
         }
@@ -130,7 +129,6 @@ export const CreateOrder = () => {
         initialValues: {
             id:"",
             type: "",
-            priceType: "",
             name: "",
             productPrice: 0,
             quantity: 0,
@@ -151,8 +149,7 @@ export const CreateOrder = () => {
                     quantity: values.quantity,
                     productPrice: values.productPrice,
                     totalPrice: values.totalPrice,
-                    type: values.type,
-                    priceType: values.priceType
+                    type: values.type
                 }]
             };
 
@@ -256,20 +253,6 @@ export const CreateOrder = () => {
                                 fullWidth
                                 error={formik.errors.type}
                                 helperText={formik.errors.type}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                size="small"
-                                id="priceType"
-                                name="priceType"
-                                label="Price Type"
-                                value={formik.values.priceType}
-                                disabled
-                                required
-                                fullWidth
-                                error={formik.errors.priceType}
-                                helperText={formik.errors.priceType}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>

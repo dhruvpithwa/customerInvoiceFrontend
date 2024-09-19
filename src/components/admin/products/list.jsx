@@ -49,7 +49,6 @@ export const ListProjects = () => {
               <TableCell><b>Name</b></TableCell>
               <TableCell><b>Type</b></TableCell>
               <TableCell><b>Price / Kg</b></TableCell>
-              <TableCell><b>Price Type</b></TableCell>
               <TableCell><b>Action</b> </TableCell>
             </TableRow>
           </TableHead>
@@ -61,7 +60,6 @@ export const ListProjects = () => {
                     <TableCell>{productObj.name}</TableCell>
                     <TableCell>{productObj.type.toUpperCase()}</TableCell>
                     <TableCell>{productObj.pricePerKg}</TableCell>
-                    <TableCell>{productObj.priceType.toUpperCase()}</TableCell>
                     <TableCell>
                       <Button variant='outlined' sx={{margin: '5px'}} onClick={()=>{ setEditProductId(productObj.id); setOpen(true)}}>Edit</Button>
                       <Button variant='outlined' sx={{margin: '5px'}} onClick={()=>{ dispatch(deleteProductAction(productObj.id))}}>Delete</Button>
