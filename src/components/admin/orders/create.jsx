@@ -2,11 +2,12 @@ import moment from 'moment/moment';
 import { useEffect, useState } from 'react';
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from 'react-redux';
-import { Autocomplete, Box, Button, Card, Grid, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Card, CardContent, Grid, TextField, Typography, Select, MenuItem } from '@mui/material';
+import { CreateProduct } from '../products/create';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
-import { generatePdfDefinition } from './helper';
+import { generatePdfDefinition, generatePdfDefinition2 } from './helper';
 import { Delete, Sync } from '@mui/icons-material';
 import { createOrderAction, fetchWeightsAction } from '../../../store/orders';
 
@@ -23,7 +24,7 @@ export const CreateOrder = () => {
         orderItems: [],
         subTotal: 0,
         tax: 0,
-        taxPercent: 12,
+        taxPercent: 0,
         total: 0
     };
     const { products: { rows} } = useSelector(state => state.productState);
@@ -43,6 +44,11 @@ export const CreateOrder = () => {
         }
     }
 
+    const onPriceChange = (e) => {
+        const val = e.target.value;
+        formik.setFieldValue('productPrice', val);
+        formik.setFieldValue('totalPrice', formik.values.quantity * val);
+    }
     const onQuantityChange = (e) => {
         const val = e.target.value;
         formik.setFieldValue('quantity', val);
@@ -59,35 +65,50 @@ export const CreateOrder = () => {
     }
 
     const onCustomerInfoChange = (e) => {
+
+        const { id, value} = e.target;
+
+        const obj = {};
+        if(id === 'taxPercent'){
+            obj['taxPercent'] = Number(value);
+            obj['tax'] = orderProps.subTotal * ( value / 100);
+            obj['total'] = orderProps.subTotal + obj['tax'];
+        }
+
         setOrderProps((prevProps) => {
             return {
                 ...prevProps,
-                [e.target.id]: e.target.value
+                [e.target.id]: e.target.value,
+                ...obj
             }
         });
     }
 
     const removeItem = (index) => {
-        const item = orderProps.orderItems[index];
 
-        const subTotal = orderProps.subTotal - item.totalPrice;
-        const tax = subTotal * (orderProps.taxPercent / 100);
+        if(window.confirm('Are you sure, you want to delete ?')){
 
-        const newItem = {
-            subTotal: subTotal,
-            tax: tax,
-            total: subTotal + tax,
-            orderItems: orderProps.orderItems.filter((item, position) => position !== index)
-        };
+            const item = orderProps.orderItems[index];
 
-        setOrderProps((prevProps)=> {
-            const newProps = {
-                ...prevProps,
-                ...newItem
-            }
-            generatePdf(newProps);
-            return newProps;
-        });
+            const subTotal = orderProps.subTotal - item.totalPrice;
+            const tax = subTotal * (orderProps.taxPercent / 100);
+
+            const newItem = {
+                subTotal: subTotal,
+                tax: tax,
+                total: subTotal + tax,
+                orderItems: orderProps.orderItems.filter((item, position) => position !== index)
+            };
+
+            setOrderProps((prevProps)=> {
+                const newProps = {
+                    ...prevProps,
+                    ...newItem
+                }
+                generatePdf(newProps);
+                return newProps;
+            });
+        }
     }
 
     const generatePdf = (pdfProps) => {
@@ -99,7 +120,7 @@ export const CreateOrder = () => {
             totalPrice: item.totalPrice
         }}) ?? [];
 
-        const pdfObject = generatePdfDefinition(updatedProps);
+        const pdfObject = template === 1 ? generatePdfDefinition(updatedProps) : generatePdfDefinition2(updatedProps) ;
         pdfMake.createPdf(pdfObject).getBlob((blob) => {
             const url = URL.createObjectURL(blob);
             setPdfUrl(url);
@@ -122,6 +143,7 @@ export const CreateOrder = () => {
     }
 
     const [pdfUrl, setPdfUrl] = useState('');
+    const [template, setTemplate] = useState(1);
     const [orderProps, setOrderProps] = useState(initialOrderProps);
 
     const formik = useFormik({
@@ -130,6 +152,7 @@ export const CreateOrder = () => {
             id:"",
             type: "",
             name: "",
+            template: 1,
             productPrice: 0,
             quantity: 0,
             totalPrice: 0
@@ -167,10 +190,17 @@ export const CreateOrder = () => {
 
     useEffect(() => {
         generatePdf(orderProps);
-    }, []);
+    }, [template]);
 
     return (
         <>
+
+        <Card>
+            <CardContent>
+            <CreateProduct />
+            </CardContent>
+        </Card>
+        
         <br></br>
         <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -214,7 +244,22 @@ export const CreateOrder = () => {
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={12} mt={2}>
+                        <Grid item xs={12} md={6} mt={2} >
+                            <Select
+                                size="small"
+                                id="template"
+                                name="template"
+                                value={template}
+                                label="Select Template"
+                                onChange={(e)=>setTemplate(e.target.value)}
+                                required
+                                fullWidth
+                            >
+                                <MenuItem value={1}>PDF Template 1</MenuItem>
+                                <MenuItem value={2}>PDF Template 2</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} md={6} mt={2}>
                             <Autocomplete
                                 size="small"
                                 id="name"
@@ -234,7 +279,7 @@ export const CreateOrder = () => {
                                 name="productPrice"
                                 label="Product Price"
                                 value={formik.values.productPrice}
-                                onChange={formik.handleChange}
+                                onChange={onPriceChange}
                                 required
                                 fullWidth
                                 error={formik.errors.productPrice}
