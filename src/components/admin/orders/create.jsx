@@ -115,7 +115,7 @@ export const CreateOrder = () => {
         const updatedProps = JSON.parse(JSON.stringify(pdfProps));
         updatedProps.orderItems = updatedProps['orderItems']?.map(item => { return { 
             name: rows[item.productId].name,
-            productPrice: rows[item.productId].pricePerKg,
+            productPrice: item.productPrice,
             quantity: item.quantity,
             totalPrice: item.totalPrice
         }}) ?? [];
