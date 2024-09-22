@@ -10,6 +10,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { generatePdfDefinition, generatePdfDefinition2 } from './helper';
 import { Delete, Sync } from '@mui/icons-material';
 import { createOrderAction, fetchWeightsAction } from '../../../store/orders';
+import { ProductType } from '../../../enums/product';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -313,7 +314,7 @@ export const CreateOrder = () => {
                                 fullWidth
                                 error={formik.errors.quantity}
                                 helperText={formik.errors.quantity}
-                                InputProps={{endAdornment: <Button onClick={weighingScaleHandler}><Sync/></Button>}}
+                                InputProps={{endAdornment: formik.values.type === ProductType.WEIGHTED ? <Button onClick={weighingScaleHandler}><Sync/></Button> : ""}}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
