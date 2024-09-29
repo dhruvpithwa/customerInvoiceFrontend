@@ -1,7 +1,7 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { setNotification, startLoading, stopLoading } from "./application"
-import { createOrder, fetchWeights, listOrders } from '../services/order';
+import { createOrder, fetchWeights, listOrders, deleteOrder } from '../services/order';
 
 
 const initialState = {
@@ -57,6 +57,23 @@ export const createOrderAction = (payload) => {
             dispatch(stopLoading());
             dispatch(setNotification({ open: true, severity: 'error', message: 'Something went wrong, please try again!'}));
             return {};
+        }
+    }
+}
+
+export const deleteOrderAction = (orderId) => {
+    return async(dispatch) => {
+        try{
+            dispatch(startLoading());
+            await deleteOrder(orderId);
+            dispatch(setNotification({ open: true, severity: 'success', message: 'Order deleted successfully'}));
+            dispatch(stopLoading());
+            dispatch(listOrdersAction());
+        }
+        catch(error){
+            console.log(error);
+            dispatch(stopLoading());
+            dispatch(setNotification({ open: true, severity: 'error', message: 'Something went wrong, please try again!'}));
         }
     }
 }

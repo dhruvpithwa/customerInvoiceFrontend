@@ -72,7 +72,7 @@ export const CreateOrder = () => {
         const obj = {};
         if(id === 'taxPercent'){
             obj['taxPercent'] = Number(value);
-            obj['tax'] = orderProps.subTotal * ( value / 100);
+            obj['tax'] = Math.round(orderProps.subTotal * ( value / 100));
             obj['total'] = orderProps.subTotal + obj['tax'];
         }
 
@@ -91,8 +91,8 @@ export const CreateOrder = () => {
 
             const item = orderProps.orderItems[index];
 
-            const subTotal = orderProps.subTotal - item.totalPrice;
-            const tax = subTotal * (orderProps.taxPercent / 100);
+            const subTotal = Math.round(orderProps.subTotal - item.totalPrice);
+            const tax = Math.round(subTotal * (orderProps.taxPercent / 100));
 
             const newItem = {
                 subTotal: subTotal,
@@ -160,8 +160,8 @@ export const CreateOrder = () => {
         },
         onSubmit: async (values) => {
 
-            const subTotal = orderProps.subTotal + values.totalPrice;
-            const tax = subTotal * (orderProps.taxPercent / 100);
+            const subTotal = Math.round(orderProps.subTotal + values.totalPrice);
+            const tax = Math.round(subTotal * (orderProps.taxPercent / 100));
 
             const newItem = {
                 subTotal: subTotal,

@@ -2,7 +2,7 @@ import { Button, Paper, TextField, Typography, TableContainer, Table, TableHead,
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState, Children } from 'react';
-import { listOrdersAction } from '../../../store/orders';
+import { listOrdersAction, deleteOrderAction  } from '../../../store/orders';
 import { Pagination } from '../../common/pagination';
 
 export const ListOrders = () => {
@@ -74,6 +74,7 @@ export const ListOrders = () => {
                             <TableCell><b>Subtotal</b></TableCell>
                             <TableCell><b>Tax</b></TableCell>
                             <TableCell><b>Total</b></TableCell>
+                            <TableCell><b>Action</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -88,6 +89,7 @@ export const ListOrders = () => {
                                         <TableCell>{orderObj.subTotal}</TableCell>
                                         <TableCell>{orderObj.tax} ({orderObj.taxPercent}%)</TableCell>
                                         <TableCell>{orderObj.total}</TableCell>
+                                        <TableCell><Button variant='outlined' sx={{margin: '5px'}} onClick={()=>{ dispatch(deleteOrderAction(orderObj.id))}}>Delete</Button></TableCell>
                                     </TableRow>
                                 );
                             }))

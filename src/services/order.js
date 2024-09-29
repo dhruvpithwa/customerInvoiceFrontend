@@ -33,6 +33,18 @@ export const createOrder = async (payload) => {
     }
 }
 
+export const deleteOrder = async (orderId) => {
+    try{
+        await axios.delete(`http://localhost:9000/api/orders/${orderId}`, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        });
+    }
+    catch(error){
+        throw error;
+    }
+}
 
 export const fetchWeights = async () => {
     try{
